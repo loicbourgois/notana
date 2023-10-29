@@ -1,0 +1,19 @@
+version: "3"
+services:
+    front:
+        image: nginx
+        ports:
+            - 80:80
+        volumes:
+            - $HOME/github.com/loicbourgois/taskini/front:/usr/share/nginx/html
+    # back:
+    #     build:
+    #         context: $HOME/github.com/loicbourgois/taskini
+    #         dockerfile: $HOME/github.com/loicbourgois/taskini/backend/Dockerfile
+    #     # command: ls /root/github.com/loicbourgois/taskini/backend
+    #     command: cargo run --manifest-path /root/github.com/loicbourgois/taskini/backend/Cargo.toml
+    #     # image: nginx
+    #     # ports:
+    #     #     - 80:80
+    #     volumes:
+    #         - $HOME/github.com/loicbourgois/taskini/backend:/root/github.com/loicbourgois/taskini/backend:rw

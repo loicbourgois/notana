@@ -1,0 +1,21 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio-tungstenite = "*"
+tokio = { version = "*", features = ["full"] }
+futures-util = "*"
+env_logger = "*"
+log = { version = "*" }
+futures-channel = "*"
+url = "*"
+crossterm = { version="*", features = ["event-stream","events"] }
+futures-timer = "*"
+futures = "*"
+serde_json = "*"
+serde = { version = "*", features = ["derive"] }
+taskini-common = { path = "../comon" }
