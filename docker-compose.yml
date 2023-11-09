@@ -5,7 +5,7 @@ services:
         ports:
             - 80:80
         volumes:
-            - $HOME/github.com/loicbourgois/taskini/front:/usr/share/nginx/html
+            - $HOME/github.com/loicbourgois/notana/front:/usr/share/nginx/html
     # back:
     #     build:
     #         context: $HOME/github.com/loicbourgois/taskini

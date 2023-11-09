@@ -1,0 +1,5 @@
+common/target/*
+client/target/*
+client_2/target/*
+server/target/*
+wasm/target/*

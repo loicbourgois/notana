@@ -1,5 +1,5 @@
 #!/bin/sh
-cd $HOME/github.com/loicbourgois/taskini/wasm
+cd $HOME/github.com/loicbourgois/notana/wasm
 rustup override set stable
 cargo +nightly fmt
 RUST_BACKTRACE=1 cargo test
@@ -19,11 +19,12 @@ cargo clippy -- \
     -A clippy::single_match_else
 echo "wasm-pack build"
 echo "build"
-rm -rf $HOME/github.com/loicbourgois/taskini/front/wasm
-rm -rf $HOME/github.com/loicbourgois/taskini/wasm/pkg/
+rm -rf $HOME/github.com/loicbourgois/notana/front/wasm
+rm -rf $HOME/github.com/loicbourgois/notana/wasm/pkg/
 wasm-pack build --no-typescript --release --target web
-cp -r $HOME/github.com/loicbourgois/taskini/wasm/pkg/ $HOME/github.com/loicbourgois/taskini/front/wasm
+cp -r $HOME/github.com/loicbourgois/notana/wasm/pkg/ $HOME/github.com/loicbourgois/notana/front/wasm
+echo "http://localhost/"
 docker-compose \
-  --file $HOME/github.com/loicbourgois/taskini/docker-compose.yml \
+  --file $HOME/github.com/loicbourgois/notana/docker-compose.yml \
   up \
   --renew-anon-volumes --build --force-recreate --remove-orphans
