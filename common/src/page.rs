@@ -1,13 +1,10 @@
 use crate::count_start_spaces;
 use crate::my_uuid;
 use crate::read_path_buf;
-use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::path::PathBuf;
-use std::sync::Arc;
-use std::sync::RwLock;
 use uuid::Uuid;
 trait Element: Debug {
     fn add_child(&mut self, child: Box<dyn Element>) -> *mut dyn Element;
@@ -22,12 +19,12 @@ impl Element for Title {
     fn add_child(&mut self, child: Box<dyn Element>) -> *mut dyn Element {
         self.childs.push(child);
         let l = self.childs.len() - 1;
-        return &mut *self.childs[l];
+        &mut *self.childs[l]
     }
 
     fn to_md(&self, depth: usize) -> String {
         let mut strs = Vec::new();
-        strs.push(format!(""));
+        strs.push(String::new());
         strs.push(format!("{} {}", "#".repeat(depth + 1), self.value));
         for c in &self.childs {
             strs.push(c.to_md(depth + 1));
@@ -48,7 +45,7 @@ impl Element for Page {
     fn add_child(&mut self, child: Box<dyn Element>) -> *mut dyn Element {
         self.childs.push(child);
         let l = self.childs.len() - 1;
-        return &mut *self.childs[l];
+        &mut *self.childs[l]
     }
 
     fn to_md(&self, depth: usize) -> String {
@@ -57,7 +54,7 @@ impl Element for Page {
         for c in &self.childs {
             strs.push(c.to_md(depth + 1));
         }
-        strs.push(format!(""));
+        strs.push(String::new());
         strs.join("\n")
     }
 }

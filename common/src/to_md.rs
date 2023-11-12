@@ -24,7 +24,7 @@ impl Title {
         for _ in 0..level {
             level_str = format!("#{level_str}");
         }
-        return format!("\n{level_str} {}", self.txt.clone());
+        format!("\n{level_str} {}", self.txt.clone())
     }
 }
 impl Text {
@@ -33,12 +33,12 @@ impl Text {
         for _ in 0..indent {
             indent_str = format!("    {indent_str}");
         }
-        return format!("{indent_str}{}", self.txt.clone());
+        format!("{indent_str}{}", self.txt.clone())
     }
 }
 impl PageElement {
     pub fn to_md(&self) -> String {
-        return format!("# {}", self.title.clone().unwrap());
+        format!("# {}", self.title.clone().unwrap())
     }
 }
 impl ListElement {
@@ -47,7 +47,7 @@ impl ListElement {
         for _ in 0..indent {
             indent_str = format!("    {indent_str}");
         }
-        return format!("{indent_str}- {}", self.txt.clone());
+        format!("{indent_str}- {}", self.txt.clone())
     }
 }
 impl Comment {
@@ -66,7 +66,7 @@ impl Comment {
             Some(x) => format!("l{x} "),
             None => "".to_string(),
         };
-        return format!("{level_str}- {line_str}@{}\n{text_str}", self.user.clone());
+        format!("{level_str}- {line_str}@{}\n{text_str}", self.user.clone())
     }
 }
 pub fn childs_to_md(childs: &Vec<Element>, level: usize, child_indent: usize) -> String {
@@ -91,15 +91,15 @@ impl Element {
                     child_indent,
                 );
                 // let aa = format!("{:?}", comments);
-                format!("\n\n# Comments\n{comments_md}").to_string()
+                format!("\n\n# Comments\n{comments_md}")
             }
             _ => "".to_string(),
         };
         let child_md = childs_to_md(&self.childs, level, child_indent);
-        if self.childs.len() > 0 {
-            return format!("{}\n{}{comments}", self.data.to_md(level, indent), child_md);
+        if !self.childs.is_empty() {
+            format!("{}\n{}{comments}", self.data.to_md(level, indent), child_md)
         } else {
-            return format!("{}{comments}", self.data.to_md(level, indent));
+            format!("{}{comments}", self.data.to_md(level, indent))
         }
     }
 }

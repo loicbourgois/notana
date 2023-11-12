@@ -8,27 +8,27 @@ use crate::Title;
 impl Title {
     pub fn to_html(&self, level: usize) -> String {
         let level_str = level + 1;
-        return format!("<h{level_str}>{}</h{level_str}>", self.txt.clone());
+        format!("<h{level_str}>{}</h{level_str}>", self.txt.clone())
     }
 }
 impl Text {
     pub fn to_html(&self, indent: usize) -> String {
-        return format!("<p class='indent_{indent}'>{}</p>", self.txt.clone());
+        format!("<p class='indent_{indent}'>{}</p>", self.txt.clone())
     }
 }
 impl PageElement {
     pub fn to_html(&self) -> String {
-        return format!("<h1>{}</h1>", self.title.clone().unwrap());
+        format!("<h1>{}</h1>", self.title.clone().unwrap())
     }
 }
 impl ListElement {
     pub fn to_html(&self, indent: usize) -> String {
-        return format!("<p class='indent_{indent}'>{}</p>", self.txt.clone());
+        format!("<p class='indent_{indent}'>{}</p>", self.txt.clone())
     }
 }
 impl Comment {
     pub fn to_html(&self) -> String {
-        return format!("<p>{}: {}</p>", self.user, self.text.clone().join("\n"));
+        format!("<p>{}: {}</p>", self.user, self.text.clone().join("\n"))
     }
 }
 impl ElementData {
@@ -59,27 +59,25 @@ impl Element {
             .collect::<Vec<_>>()
             .join("\n");
         let button_show_hide = match &self.data {
-            ElementData::Title(x) => String::from("<button>▼</button>"),
+            ElementData::Title(_x) => String::from("<button>▼</button>"),
             _ => String::from("<button></button>"),
         };
         let button_left = match &self.data {
-            ElementData::Text(x) => String::from("<button>←</button>"),
-            ElementData::ListElement(x) => String::from("<button>←</button>"),
+            ElementData::Text(_x) => String::from("<button>←</button>"),
+            ElementData::ListElement(_x) => String::from("<button>←</button>"),
             _ => String::from("<button></button>"),
         };
         let button_right = match &self.data {
-            ElementData::Text(x) => String::from("<button>→</button>"),
-            ElementData::ListElement(x) => String::from("<button>→</button>"),
+            ElementData::Text(_x) => String::from("<button>→</button>"),
+            ElementData::ListElement(_x) => String::from("<button>→</button>"),
             _ => String::from("<button></button>"),
         };
         let element_holder = format!(
             "<div class='element'>{button_left}{button_right}{button_show_hide}{}</div>",
             self.data.to_html(level, indent)
         );
-        let childs_class = match &self.data {
-            _ => String::from(""),
-        };
-        let main_html = if self.childs.len() > 0 {
+        let childs_class = String::from("");
+        let main_html = if !self.childs.is_empty() {
             format!("{element_holder}<div class='{childs_class}'>{child_md}</div>")
         } else {
             element_holder
@@ -89,7 +87,7 @@ impl Element {
                 let comments = data.comments.as_ref().unwrap();
                 let comments_str = comments.to_html(0, 0);
                 // println!("{:?}", str_);
-                return {
+                {
                     format!(
                         r#"
                     <div id="top_nav">
@@ -111,7 +109,7 @@ impl Element {
                     </div>
                 "#
                     )
-                };
+                }
             }
             _ => main_html,
         }

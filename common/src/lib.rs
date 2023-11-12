@@ -1,12 +1,10 @@
 use crate::element::*;
 use glob::glob;
-use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-use std::net::SocketAddr;
 use uuid::Uuid;
 mod element;
 use std::path::PathBuf;
@@ -37,22 +35,22 @@ pub fn json_file_to_md_file(path_in: &str, path_out: &str) {
 }
 pub fn count_start_spaces(words: &Vec<&str>) -> usize {
     for (i, word) in words.iter().enumerate() {
-        if *word != "" {
+        if !word.is_empty() {
             return i;
         }
     }
-    return words.len();
+    words.len()
 }
 pub fn json_file_to_html_file(path_in: &str, path_out: &str) {
     write(path_out, &json_to_html(&read(path_in)));
 }
 pub fn json_to_html(json_str: &str) -> String {
     let page: Element = serde_json::from_str(json_str).unwrap();
-    return page.to_html(0, 0);
+    page.to_html(0, 0)
 }
 pub fn json_to_md(json_str: &str) -> String {
     let page: Element = serde_json::from_str(json_str).unwrap();
-    return page.to_md(0, 0);
+    page.to_md(0, 0)
 }
 pub fn md_to_page(md_str: &str) -> Element {
     let mut page = Element {
@@ -119,7 +117,7 @@ pub fn md_to_page(md_str: &str) -> Element {
                         }),
                         childs: Vec::new(),
                     });
-                    let childs = &mut (*parent).childs;
+                    let childs = &mut parent.childs;
                     let l = childs.len() - 1;
                     let new_child_ptr: *mut Element = &mut childs[l];
                     parents.insert(1, new_child_ptr);
@@ -133,7 +131,7 @@ pub fn md_to_page(md_str: &str) -> Element {
                         }),
                         childs: Vec::new(),
                     });
-                    let childs = &mut (*parent).childs;
+                    let childs = &mut parent.childs;
                     let l = childs.len() - 1;
                     let new_child_ptr: *mut Element = &mut childs[l];
                     parents.insert(2, new_child_ptr);
@@ -149,7 +147,7 @@ pub fn md_to_page(md_str: &str) -> Element {
                         }),
                         childs: Vec::new(),
                     });
-                    let childs = &mut (*parent).childs;
+                    let childs = &mut parent.childs;
                     let l = childs.len() - 1;
                     let new_child_ptr: *mut Element = &mut childs[l];
                     parents_by_indent.insert(indent + 1, new_child_ptr);
@@ -159,11 +157,11 @@ pub fn md_to_page(md_str: &str) -> Element {
                     let parent = &mut (*parents_by_indent[&indent]);
                     parent.childs.push(Element {
                         data: ElementData::Text(Text {
-                            txt: line[start_space_count + 0..].to_string(),
+                            txt: line[start_space_count..].to_string(),
                         }),
                         childs: Vec::new(),
                     });
-                    let childs = &mut (*parent).childs;
+                    let childs = &mut parent.childs;
                     let l = childs.len() - 1;
                     let new_child_ptr: *mut Element = &mut childs[l];
                     parents_by_indent.insert(indent + 1, new_child_ptr);
@@ -176,20 +174,20 @@ pub fn md_to_page(md_str: &str) -> Element {
                     let mut line = None;
                     let user;
                     if indent == 0 {
-                        line = Some(words_2[1].replace("l", ""));
-                        user = words_2[2].replace("@", "");
+                        line = Some(words_2[1].replace('l', ""));
+                        user = words_2[2].replace('@', "");
                     } else {
-                        user = words_2[1].replace("@", "");
+                        user = words_2[1].replace('@', "");
                     }
                     parent.childs.push(Element {
                         data: ElementData::Comment(Comment {
                             text: Vec::new(),
-                            user: user,
-                            line: line,
+                            user,
+                            line,
                         }),
                         childs: Vec::new(),
                     });
-                    let childs = &mut (*parent).childs;
+                    let childs = &mut parent.childs;
                     let l = childs.len() - 1;
                     let new_child_ptr: *mut Element = &mut childs[l];
                     last_comment_parent_id = indent + 1;
@@ -209,7 +207,7 @@ pub fn md_to_page(md_str: &str) -> Element {
 }
 pub fn md_to_json(md_str: &str) -> String {
     let json_str = serde_json::to_string_pretty(&md_to_page(md_str)).unwrap();
-    return json_str;
+    json_str
 }
 pub enum TaskStatus {
     New,
@@ -235,9 +233,6 @@ pub struct Organization {
     tasks: HashMap<u128, Task>,
 }
 mod my_uuid {
-    use serde::de::Error;
-    use serde::Deserialize;
-    use serde::Deserializer;
     use serde::Serialize;
     use serde::Serializer;
     use uuid::Uuid;
@@ -264,7 +259,7 @@ pub struct OrganizationSettings {
 }
 impl Organization {
     pub fn new(path: &str) -> Organization {
-        let path_splitted: Vec<_> = path.split("/").collect();
+        let path_splitted: Vec<_> = path.split('/').collect();
         let n = path_splitted.len() - 1;
         let mut org = Organization {
             name: path_splitted[n].to_string(),

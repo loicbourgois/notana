@@ -2,6 +2,8 @@
 set -e
 rustup override set stable
 cargo +nightly fmt --manifest-path $HOME/github.com/loicbourgois/notana/common/Cargo.toml
+cargo clippy --manifest-path $HOME/github.com/loicbourgois/notana/common/Cargo.toml \
+    --fix --lib -p notana-common
 cargo clippy \
     --manifest-path $HOME/github.com/loicbourgois/notana/common/Cargo.toml \
     -- \
@@ -20,8 +22,6 @@ cargo clippy \
     -A clippy::single_match_else \
     -A clippy::missing_panics_doc \
     -A clippy::must_use_candidate
-cargo clippy --manifest-path $HOME/github.com/loicbourgois/notana/common/Cargo.toml \
-    --fix --lib -p notana-common
 # RUST_BACKTRACE=1 cargo test \
 #     --manifest-path $HOME/github.com/loicbourgois/notana/common/Cargo.toml \
 #     -- --nocapture
