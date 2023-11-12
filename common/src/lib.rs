@@ -206,8 +206,7 @@ pub fn md_to_page(md_str: &str) -> Element {
     page
 }
 pub fn md_to_json(md_str: &str) -> String {
-    let json_str = serde_json::to_string_pretty(&md_to_page(md_str)).unwrap();
-    json_str
+    serde_json::to_string_pretty(&md_to_page(md_str)).unwrap()
 }
 pub enum TaskStatus {
     New,
