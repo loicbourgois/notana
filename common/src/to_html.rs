@@ -76,7 +76,7 @@ impl Element {
             "<div class='element'>{button_left}{button_right}{button_show_hide}{}</div>",
             self.data.to_html(level, indent)
         );
-        let childs_class = String::from("");
+        let childs_class = String::new();
         let main_html = if !self.childs.is_empty() {
             format!("{element_holder}<div class='{childs_class}'>{child_md}</div>")
         } else {

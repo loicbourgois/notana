@@ -14,7 +14,7 @@ impl ElementData {
             ElementData::Text(x) => x.to_md(indent),
             ElementData::ListElement(x) => x.to_md(indent),
             ElementData::Comment(x) => x.to_md(level),
-            ElementData::CommentSection => "".to_string(),
+            ElementData::CommentSection => String::new(),
         }
     }
 }
@@ -29,7 +29,7 @@ impl Title {
 }
 impl Text {
     pub fn to_md(&self, indent: usize) -> String {
-        let mut indent_str = String::from("");
+        let mut indent_str = String::new();
         for _ in 0..indent {
             indent_str = format!("    {indent_str}");
         }
@@ -43,7 +43,7 @@ impl PageElement {
 }
 impl ListElement {
     pub fn to_md(&self, indent: usize) -> String {
-        let mut indent_str = String::from("");
+        let mut indent_str = String::new();
         for _ in 0..indent {
             indent_str = format!("    {indent_str}");
         }
@@ -52,7 +52,7 @@ impl ListElement {
 }
 impl Comment {
     pub fn to_md(&self, level: usize) -> String {
-        let mut level_str = String::from("");
+        let mut level_str = String::new();
         for _ in 1..level {
             level_str = format!("  {level_str}");
         }
@@ -64,7 +64,7 @@ impl Comment {
             .join("\n");
         let line_str = match &self.line {
             Some(x) => format!("l{x} "),
-            None => "".to_string(),
+            None => String::new(),
         };
         format!("{level_str}- {line_str}@{}\n{text_str}", self.user.clone())
     }
@@ -93,7 +93,7 @@ impl Element {
                 // let aa = format!("{:?}", comments);
                 format!("\n\n# Comments\n{comments_md}")
             }
-            _ => "".to_string(),
+            _ => String::new(),
         };
         let child_md = childs_to_md(&self.childs, level, child_indent);
         if !self.childs.is_empty() {

@@ -1,4 +1,10 @@
-use crate::element::*;
+use crate::element::Comment;
+use crate::element::Element;
+use crate::element::ElementData;
+use crate::element::ListElement;
+use crate::element::PageElement;
+use crate::element::Text;
+use crate::element::Title;
 use glob::glob;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -275,7 +281,7 @@ impl Organization {
                     let page = Page::from_path(path_md, path_md_short);
                     org.pages.insert(page.id, page);
                 }
-                Err(e) => println!("{:?}", e),
+                Err(e) => println!("{e:?}"),
             }
         }
         org

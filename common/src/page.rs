@@ -88,7 +88,7 @@ impl Page {
                             title = Some(new_title);
                         }
                         Some(value) => {
-                            panic!("Title already set: old={:?} new={}", value, new_title);
+                            panic!("Title already set: old={value:?} new={new_title}");
                         }
                     }
                 }
