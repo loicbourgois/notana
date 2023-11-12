@@ -8,7 +8,7 @@ pub struct Element {
 }
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ElementData {
-    Page(Page),
+    Page(PageElement),
     Title(Title),
     Text(Text),
     ListElement(ListElement),
@@ -28,7 +28,7 @@ pub struct ListElement {
     pub txt: String,
 }
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Page {
+pub struct PageElement {
     pub title: Option<PageTitle>,
     pub comments: Option<Box<Element>>,
 }

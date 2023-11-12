@@ -1,7 +1,8 @@
+use crate::Comment;
 use crate::Element;
 use crate::ElementData;
 use crate::ListElement;
-use crate::Page;
+use crate::PageElement;
 use crate::Text;
 use crate::Title;
 impl Title {
@@ -15,7 +16,7 @@ impl Text {
         return format!("<p class='indent_{indent}'>{}</p>", self.txt.clone());
     }
 }
-impl Page {
+impl PageElement {
     pub fn to_html(&self) -> String {
         return format!("<h1>{}</h1>", self.title.clone().unwrap());
     }
@@ -25,6 +26,11 @@ impl ListElement {
         return format!("<p class='indent_{indent}'>{}</p>", self.txt.clone());
     }
 }
+impl Comment {
+    pub fn to_html(&self) -> String {
+        return format!("<p>{}: {}</p>", self.user, self.text.clone().join("\n"));
+    }
+}
 impl ElementData {
     pub fn to_html(&self, level: usize, indent: usize) -> String {
         match self {
@@ -32,6 +38,7 @@ impl ElementData {
             ElementData::Title(x) => x.to_html(level),
             ElementData::Text(x) => x.to_html(indent),
             ElementData::ListElement(x) => x.to_html(indent),
+            ElementData::Comment(x) => x.to_html(),
             _ => String::from("-"),
         }
     }
@@ -79,23 +86,33 @@ impl Element {
         };
         match &self.data {
             ElementData::Page(data) => {
+                let comments = data.comments.as_ref().unwrap();
+                let comments_str = comments.to_html(0, 0);
+                // println!("{:?}", str_);
                 return {
                     format!(
                         r#"
-                    <div id='left'>
-                        <p>Outline</p>
+                    <div id="top_nav">
+                        <p>top nav</p>
                     </div>
-                    <div id='center'>
-                        {main_html}
-                    </div>
-                    <div id='right'>
-                        <p>Comments</p>
+                    <div id="middle">
+                        <div id='left'>
+                            <p>Outline</p>
+                        </div>
+                        <div id='center'>
+                            {main_html}
+                        </div>
+                        <div id='right'>
+                            <p>Comments</p>
+                            <div>
+                                {comments_str}
+                            </div>
+                        </div>
                     </div>
                 "#
                     )
-                }
+                };
             }
-            // main_html,
             _ => main_html,
         }
     }
