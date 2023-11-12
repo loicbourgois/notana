@@ -10,16 +10,21 @@ use std::net::SocketAddr;
 use uuid::Uuid;
 mod element;
 use std::path::PathBuf;
+mod page;
 #[cfg(test)]
 mod test;
 mod to_html;
 mod to_md;
+use page::Page;
 // pub struct NetworkTask {
 //     pub created_by: SocketAddr,
 //     pub title: String,
 // }
 pub fn read(path: &str) -> String {
     fs::read_to_string(path).expect("Should have been able to read the file")
+}
+pub fn read_path_buf(path: PathBuf) -> String {
+    read(&path.into_os_string().into_string().unwrap())
 }
 pub fn write(path: &str, content: &str) {
     write!(File::create(path).unwrap(), "{content}").unwrap();
@@ -256,21 +261,6 @@ pub struct OrganizationSettings {
     id: Uuid,
     name: String,
     id_txt: String,
-}
-#[derive(Debug, Serialize, Clone)]
-pub struct Page {
-    #[serde(with = "my_uuid")]
-    id: Uuid,
-    // title: String,
-    path: String,
-}
-impl Page {
-    pub fn from_path(path_long: PathBuf, path_short: String) -> Page {
-        Page {
-            id: Uuid::new_v4(),
-            path: path_short,
-        }
-    }
 }
 impl Organization {
     pub fn new(path: &str) -> Organization {

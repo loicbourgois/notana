@@ -17,6 +17,7 @@ fn import_export() {
     let data: Data = import_organizations(&[
         "../examples/in/tasty_bakery",
         "../examples/in/yummy_for_charity",
+        "../examples/in/notana",
     ]);
     data.export("../examples/out");
 }
