@@ -1,4 +1,4 @@
-# Taskini
+# Notana
 
 ```sh
 $HOME/github.com/loicbourgois/notana/test.sh

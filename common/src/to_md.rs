@@ -3,7 +3,7 @@ use crate::Comment;
 use crate::Element;
 use crate::ElementData;
 use crate::ListElement;
-use crate::Page;
+use crate::PageElement;
 use crate::Text;
 use crate::Title;
 impl ElementData {
@@ -36,7 +36,7 @@ impl Text {
         return format!("{indent_str}{}", self.txt.clone());
     }
 }
-impl Page {
+impl PageElement {
     pub fn to_md(&self) -> String {
         return format!("# {}", self.title.clone().unwrap());
     }
