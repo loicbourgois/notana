@@ -4,9 +4,9 @@
 
 ### Focus
 - [ ] import tasks
-    - [ ] load tasks
-    - [ ] load subtasks
-    - [ ] map tasks to page as elements
+    - [x] load tasks
+    - [x] load subtasks
+    - [ ] map tasks element as task
 
 ### Backlog
 - [ ] export tasks

@@ -20,10 +20,6 @@ mod test;
 mod to_html;
 mod to_md;
 use page::Page;
-// pub struct NetworkTask {
-//     pub created_by: SocketAddr,
-//     pub title: String,
-// }
 pub fn read(path: &str) -> String {
     fs::read_to_string(path).expect("Should have been able to read the file")
 }
@@ -214,24 +210,6 @@ pub fn md_to_page(md_str: &str) -> Element {
 pub fn md_to_json(md_str: &str) -> String {
     serde_json::to_string_pretty(&md_to_page(md_str)).unwrap()
 }
-// #[derive(Debug)]
-// pub enum TaskStatus {
-//     New,
-//     Doing,
-//     Todo,
-//     Backlog,
-//     Done,
-//     WontDo,
-//     Duplicate(Uuid),
-// }
-// #[derive(Debug)]
-// pub struct Task {
-//     title: String,
-//     description: String,
-//     lead: Option<Uuid>,
-//     status: TaskStatus,
-//     completion: Option<f32>,
-// }
 pub struct Organization {
     id: Uuid,
     id_txt: String,
