@@ -69,7 +69,7 @@ impl Comment {
         format!("{level_str}- {line_str}@{}\n{text_str}", self.user.clone())
     }
 }
-pub fn childs_to_md(childs: &Vec<Element>, level: usize, child_indent: usize) -> String {
+pub fn childs_to_md(childs: &[Element], level: usize, child_indent: usize) -> String {
     childs
         .iter()
         .map(|x| x.to_md(level + 1, child_indent))
@@ -96,10 +96,10 @@ impl Element {
             _ => String::new(),
         };
         let child_md = childs_to_md(&self.childs, level, child_indent);
-        if !self.childs.is_empty() {
-            format!("{}\n{}{comments}", self.data.to_md(level, indent), child_md)
-        } else {
+        if self.childs.is_empty() {
             format!("{}{comments}", self.data.to_md(level, indent))
+        } else {
+            format!("{}\n{}{comments}", self.data.to_md(level, indent), child_md)
         }
     }
 }

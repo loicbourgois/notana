@@ -214,28 +214,30 @@ pub fn md_to_page(md_str: &str) -> Element {
 pub fn md_to_json(md_str: &str) -> String {
     serde_json::to_string_pretty(&md_to_page(md_str)).unwrap()
 }
-pub enum TaskStatus {
-    New,
-    Doing,
-    Todo,
-    Backlog,
-    Done,
-    WontDo,
-    Duplicate(Uuid),
-}
-pub struct Task {
-    title: String,
-    description: String,
-    lead: Option<Uuid>,
-    status: TaskStatus,
-    completion: Option<f32>,
-}
+// #[derive(Debug)]
+// pub enum TaskStatus {
+//     New,
+//     Doing,
+//     Todo,
+//     Backlog,
+//     Done,
+//     WontDo,
+//     Duplicate(Uuid),
+// }
+// #[derive(Debug)]
+// pub struct Task {
+//     title: String,
+//     description: String,
+//     lead: Option<Uuid>,
+//     status: TaskStatus,
+//     completion: Option<f32>,
+// }
 pub struct Organization {
     id: Uuid,
     id_txt: String,
     name: String,
     pages: HashMap<Uuid, Page>,
-    tasks: HashMap<u128, Task>,
+    // tasks: HashMap<u128, Task>,
 }
 mod my_uuid {
     use serde::Serialize;
@@ -270,7 +272,7 @@ impl Organization {
             name: path_splitted[n].to_string(),
             id_txt: path_splitted[n].to_string(),
             pages: HashMap::new(),
-            tasks: HashMap::new(),
+            // tasks: HashMap::new(),
             id: Uuid::new_v4(),
         };
         for entry in glob(&format!("{path}/**/*.md")).expect("Failed to read glob pattern") {
@@ -293,7 +295,7 @@ impl Organization {
             &format!("{path}/{}/settings/organization.json", self.name),
             &serde_json::to_string_pretty(&self.settings()).unwrap(),
         );
-        for (_, page) in &self.pages {
+        for page in self.pages.values() {
             write(
                 &format!("{path}/{}.json", page.path),
                 &serde_json::to_string_pretty(&page).unwrap(),
@@ -314,7 +316,7 @@ pub struct Data {
 }
 impl Data {
     pub fn export(&self, path: &str) {
-        for (_, org) in &self.organizations {
+        for org in self.organizations.values() {
             org.export(path);
         }
     }

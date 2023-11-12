@@ -39,7 +39,7 @@ impl ElementData {
             ElementData::Text(x) => x.to_html(indent),
             ElementData::ListElement(x) => x.to_html(indent),
             ElementData::Comment(x) => x.to_html(),
-            _ => String::from("-"),
+            ElementData::CommentSection => String::from("-"),
         }
     }
 }
@@ -77,10 +77,10 @@ impl Element {
             self.data.to_html(level, indent)
         );
         let childs_class = String::new();
-        let main_html = if !self.childs.is_empty() {
-            format!("{element_holder}<div class='{childs_class}'>{child_md}</div>")
-        } else {
+        let main_html = if self.childs.is_empty() {
             element_holder
+        } else {
+            format!("{element_holder}<div class='{childs_class}'>{child_md}</div>")
         };
         match &self.data {
             ElementData::Page(data) => {
