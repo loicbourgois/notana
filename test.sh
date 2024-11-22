@@ -23,6 +23,7 @@ cargo clippy \
     -A clippy::single_match_else \
     -A clippy::missing_panics_doc \
     -A clippy::must_use_candidate
+rm -rf $HOME/github.com/loicbourgois/notana/examples/out
 RUST_BACKTRACE=1 cargo test \
     --manifest-path $HOME/github.com/loicbourgois/notana/common/Cargo.toml \
     -- --nocapture

@@ -5,8 +5,6 @@ use crate::element::ListElement;
 use crate::element::PageElement;
 use crate::element::Text;
 use crate::element::Title;
-use glob::glob;
-use serde::Serialize;
 use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
@@ -14,11 +12,14 @@ use std::io::Write;
 use uuid::Uuid;
 mod element;
 use std::path::PathBuf;
+mod organization;
 mod page;
+mod task;
 #[cfg(test)]
 mod test;
 mod to_html;
 mod to_md;
+use organization::Organization;
 use page::Page;
 pub fn read(path: &str) -> String {
     fs::read_to_string(path).expect("Should have been able to read the file")
@@ -210,13 +211,6 @@ pub fn md_to_page(md_str: &str) -> Element {
 pub fn md_to_json(md_str: &str) -> String {
     serde_json::to_string_pretty(&md_to_page(md_str)).unwrap()
 }
-pub struct Organization {
-    id: Uuid,
-    id_txt: String,
-    name: String,
-    pages: HashMap<Uuid, Page>,
-    // tasks: HashMap<u128, Task>,
-}
 mod my_uuid {
     use serde::Serialize;
     use serde::Serializer;
@@ -234,60 +228,6 @@ mod my_uuid {
     //     let val: &str = Deserialize::deserialize(deserializer)?;
     //     UUID::from_str(val).map_err(D::Error::custom)
     // }
-}
-#[derive(Debug, Serialize, Clone)]
-pub struct OrganizationSettings {
-    #[serde(with = "my_uuid")]
-    id: Uuid,
-    name: String,
-    id_txt: String,
-}
-impl Organization {
-    pub fn new(path: &str) -> Organization {
-        let path_splitted: Vec<_> = path.split('/').collect();
-        let n = path_splitted.len() - 1;
-        let mut org = Organization {
-            name: path_splitted[n].to_string(),
-            id_txt: path_splitted[n].to_string(),
-            pages: HashMap::new(),
-            // tasks: HashMap::new(),
-            id: Uuid::new_v4(),
-        };
-        for entry in glob(&format!("{path}/**/*.md")).expect("Failed to read glob pattern") {
-            match entry {
-                Ok(path_md) => {
-                    let path_long = path_md.clone().into_os_string().into_string().unwrap();
-                    let path_md_short = path_long.replace(path, "").replace(".md", "");
-                    let page = Page::from_path(path_md, path_md_short);
-                    org.pages.insert(page.id, page);
-                }
-                Err(e) => println!("{e:?}"),
-            }
-        }
-        org
-    }
-
-    pub fn export(&self, path: &str) {
-        fs::create_dir_all(&format!("{path}/{}/settings/", self.name)).unwrap();
-        write(
-            &format!("{path}/{}/settings/organization.json", self.name),
-            &serde_json::to_string_pretty(&self.settings()).unwrap(),
-        );
-        for page in self.pages.values() {
-            write(
-                &format!("{path}/{}.json", page.path),
-                &serde_json::to_string_pretty(&page).unwrap(),
-            );
-        }
-    }
-
-    pub fn settings(&self) -> OrganizationSettings {
-        OrganizationSettings {
-            id: self.id,
-            name: self.name.clone(),
-            id_txt: self.id_txt.clone(),
-        }
-    }
 }
 pub struct Data {
     organizations: HashMap<Uuid, Organization>,

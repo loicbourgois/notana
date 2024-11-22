@@ -9,6 +9,7 @@ edition = "2021"
 serde_json = "*"
 serde = { version = "*", features = ["derive"] }
 glob = "*"
+similar-asserts = "*"
 [dependencies.uuid]
 version = "*"
 features = [
