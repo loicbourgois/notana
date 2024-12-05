@@ -1,24 +1,31 @@
-use crate::element::*;
-use serde::Deserialize;
-use serde::Serialize;
+use crate::element::Comment;
+use crate::element::Element;
+use crate::element::ElementData;
+use crate::element::ListElement;
+use crate::element::PageElement;
+use crate::element::Text;
+use crate::element::Title;
 use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-use std::net::SocketAddr;
+use uuid::Uuid;
 mod element;
+use std::path::PathBuf;
+mod organization;
+mod page;
+mod task;
 #[cfg(test)]
 mod test;
 mod to_html;
 mod to_md;
-pub type Tasks = Vec<Task>;
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Task {
-    pub created_by: SocketAddr,
-    pub title: String,
-}
+use organization::Organization;
+use page::Page;
 pub fn read(path: &str) -> String {
     fs::read_to_string(path).expect("Should have been able to read the file")
+}
+pub fn read_path_buf(path: PathBuf) -> String {
+    read(&path.into_os_string().into_string().unwrap())
 }
 pub fn write(path: &str, content: &str) {
     write!(File::create(path).unwrap(), "{content}").unwrap();
@@ -31,26 +38,26 @@ pub fn json_file_to_md_file(path_in: &str, path_out: &str) {
 }
 pub fn count_start_spaces(words: &Vec<&str>) -> usize {
     for (i, word) in words.iter().enumerate() {
-        if *word != "" {
+        if !word.is_empty() {
             return i;
         }
     }
-    return words.len();
+    words.len()
 }
 pub fn json_file_to_html_file(path_in: &str, path_out: &str) {
     write(path_out, &json_to_html(&read(path_in)));
 }
 pub fn json_to_html(json_str: &str) -> String {
     let page: Element = serde_json::from_str(json_str).unwrap();
-    return page.to_html(0, 0);
+    page.to_html(0, 0)
 }
 pub fn json_to_md(json_str: &str) -> String {
     let page: Element = serde_json::from_str(json_str).unwrap();
-    return page.to_md(0, 0);
+    page.to_md(0, 0)
 }
-pub fn md_to_json(md_str: &str) -> String {
+pub fn md_to_page(md_str: &str) -> Element {
     let mut page = Element {
-        data: ElementData::Page(Page {
+        data: ElementData::Page(PageElement {
             title: None,
             comments: None,
         }),
@@ -113,7 +120,7 @@ pub fn md_to_json(md_str: &str) -> String {
                         }),
                         childs: Vec::new(),
                     });
-                    let childs = &mut (*parent).childs;
+                    let childs = &mut parent.childs;
                     let l = childs.len() - 1;
                     let new_child_ptr: *mut Element = &mut childs[l];
                     parents.insert(1, new_child_ptr);
@@ -127,7 +134,7 @@ pub fn md_to_json(md_str: &str) -> String {
                         }),
                         childs: Vec::new(),
                     });
-                    let childs = &mut (*parent).childs;
+                    let childs = &mut parent.childs;
                     let l = childs.len() - 1;
                     let new_child_ptr: *mut Element = &mut childs[l];
                     parents.insert(2, new_child_ptr);
@@ -143,7 +150,7 @@ pub fn md_to_json(md_str: &str) -> String {
                         }),
                         childs: Vec::new(),
                     });
-                    let childs = &mut (*parent).childs;
+                    let childs = &mut parent.childs;
                     let l = childs.len() - 1;
                     let new_child_ptr: *mut Element = &mut childs[l];
                     parents_by_indent.insert(indent + 1, new_child_ptr);
@@ -153,11 +160,11 @@ pub fn md_to_json(md_str: &str) -> String {
                     let parent = &mut (*parents_by_indent[&indent]);
                     parent.childs.push(Element {
                         data: ElementData::Text(Text {
-                            txt: line[start_space_count + 0..].to_string(),
+                            txt: line[start_space_count..].to_string(),
                         }),
                         childs: Vec::new(),
                     });
-                    let childs = &mut (*parent).childs;
+                    let childs = &mut parent.childs;
                     let l = childs.len() - 1;
                     let new_child_ptr: *mut Element = &mut childs[l];
                     parents_by_indent.insert(indent + 1, new_child_ptr);
@@ -170,20 +177,20 @@ pub fn md_to_json(md_str: &str) -> String {
                     let mut line = None;
                     let user;
                     if indent == 0 {
-                        line = Some(words_2[1].replace("l", ""));
-                        user = words_2[2].replace("@", "");
+                        line = Some(words_2[1].replace('l', ""));
+                        user = words_2[2].replace('@', "");
                     } else {
-                        user = words_2[1].replace("@", "");
+                        user = words_2[1].replace('@', "");
                     }
                     parent.childs.push(Element {
                         data: ElementData::Comment(Comment {
                             text: Vec::new(),
-                            user: user,
-                            line: line,
+                            user,
+                            line,
                         }),
                         childs: Vec::new(),
                     });
-                    let childs = &mut (*parent).childs;
+                    let childs = &mut parent.childs;
                     let l = childs.len() - 1;
                     let new_child_ptr: *mut Element = &mut childs[l];
                     last_comment_parent_id = indent + 1;
@@ -199,6 +206,46 @@ pub fn md_to_json(md_str: &str) -> String {
             _ => {}
         }
     }
-    let json_str = serde_json::to_string_pretty(&page).unwrap();
-    return json_str;
+    page
+}
+pub fn md_to_json(md_str: &str) -> String {
+    serde_json::to_string_pretty(&md_to_page(md_str)).unwrap()
+}
+mod my_uuid {
+    use serde::Serialize;
+    use serde::Serializer;
+    use uuid::Uuid;
+    pub fn serialize<S>(val: &Uuid, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        val.to_string().serialize(serializer)
+    }
+    // pub fn deserialize<'de, D>(deserializer: D) -> Result<UUID, D::Error>
+    // where
+    //     D: Deserializer<'de>,
+    // {
+    //     let val: &str = Deserialize::deserialize(deserializer)?;
+    //     UUID::from_str(val).map_err(D::Error::custom)
+    // }
+}
+pub struct Data {
+    organizations: HashMap<Uuid, Organization>,
+}
+impl Data {
+    pub fn export(&self, path: &str) {
+        for org in self.organizations.values() {
+            org.export(path);
+        }
+    }
+}
+pub fn import_organizations(paths: &[&str]) -> Data {
+    let mut data = Data {
+        organizations: HashMap::new(),
+    };
+    for path in paths {
+        let org = Organization::new(path);
+        data.organizations.insert(org.id, org);
+    }
+    data
 }

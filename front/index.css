@@ -57,11 +57,30 @@ body {
   
   #center {
     flex-grow: 2;
+    width: 0;
   }
   #left {
+    width: 0;
     flex-grow: 1;
   }
   #right {
+    width: 0;
     flex-grow: 1;
   }
+
+body {
+    flex-direction: column;
+  }
   
+  #middle {
+    display: flex;
+    /* width: 100vh; */
+  }
+  
+  #right button {
+    display: none;
+  }
+
+  #right div {
+    margin-left: 1rem;
+  }

@@ -1,28 +1,34 @@
+use crate::Comment;
 use crate::Element;
 use crate::ElementData;
 use crate::ListElement;
-use crate::Page;
+use crate::PageElement;
 use crate::Text;
 use crate::Title;
 impl Title {
     pub fn to_html(&self, level: usize) -> String {
         let level_str = level + 1;
-        return format!("<h{level_str}>{}</h{level_str}>", self.txt.clone());
+        format!("<h{level_str}>{}</h{level_str}>", self.txt.clone())
     }
 }
 impl Text {
     pub fn to_html(&self, indent: usize) -> String {
-        return format!("<p class='indent_{indent}'>{}</p>", self.txt.clone());
+        format!("<p class='indent_{indent}'>{}</p>", self.txt.clone())
     }
 }
-impl Page {
+impl PageElement {
     pub fn to_html(&self) -> String {
-        return format!("<h1>{}</h1>", self.title.clone().unwrap());
+        format!("<h1>{}</h1>", self.title.clone().unwrap())
     }
 }
 impl ListElement {
     pub fn to_html(&self, indent: usize) -> String {
-        return format!("<p class='indent_{indent}'>{}</p>", self.txt.clone());
+        format!("<p class='indent_{indent}'>{}</p>", self.txt.clone())
+    }
+}
+impl Comment {
+    pub fn to_html(&self) -> String {
+        format!("<p>{}: {}</p>", self.user, self.text.clone().join("\n"))
     }
 }
 impl ElementData {
@@ -32,7 +38,8 @@ impl ElementData {
             ElementData::Title(x) => x.to_html(level),
             ElementData::Text(x) => x.to_html(indent),
             ElementData::ListElement(x) => x.to_html(indent),
-            _ => String::from("-"),
+            ElementData::Comment(x) => x.to_html(),
+            ElementData::CommentSection => String::from("-"),
         }
     }
 }
@@ -52,50 +59,58 @@ impl Element {
             .collect::<Vec<_>>()
             .join("\n");
         let button_show_hide = match &self.data {
-            ElementData::Title(x) => String::from("<button>▼</button>"),
+            ElementData::Title(_x) => String::from("<button>▼</button>"),
             _ => String::from("<button></button>"),
         };
         let button_left = match &self.data {
-            ElementData::Text(x) => String::from("<button>←</button>"),
-            ElementData::ListElement(x) => String::from("<button>←</button>"),
+            ElementData::Text(_x) => String::from("<button>←</button>"),
+            ElementData::ListElement(_x) => String::from("<button>←</button>"),
             _ => String::from("<button></button>"),
         };
         let button_right = match &self.data {
-            ElementData::Text(x) => String::from("<button>→</button>"),
-            ElementData::ListElement(x) => String::from("<button>→</button>"),
+            ElementData::Text(_x) => String::from("<button>→</button>"),
+            ElementData::ListElement(_x) => String::from("<button>→</button>"),
             _ => String::from("<button></button>"),
         };
         let element_holder = format!(
             "<div class='element'>{button_left}{button_right}{button_show_hide}{}</div>",
             self.data.to_html(level, indent)
         );
-        let childs_class = match &self.data {
-            _ => String::from(""),
-        };
-        let main_html = if self.childs.len() > 0 {
-            format!("{element_holder}<div class='{childs_class}'>{child_md}</div>")
-        } else {
+        let childs_class = String::new();
+        let main_html = if self.childs.is_empty() {
             element_holder
+        } else {
+            format!("{element_holder}<div class='{childs_class}'>{child_md}</div>")
         };
         match &self.data {
             ElementData::Page(data) => {
-                return {
+                let comments = data.comments.as_ref().unwrap();
+                let comments_str = comments.to_html(0, 0);
+                // println!("{:?}", str_);
+                {
                     format!(
                         r#"
-                    <div id='left'>
-                        <p>Outline</p>
+                    <div id="top_nav">
+                        <p>top nav</p>
                     </div>
-                    <div id='center'>
-                        {main_html}
-                    </div>
-                    <div id='right'>
-                        <p>Comments</p>
+                    <div id="middle">
+                        <div id='left'>
+                            <p>Outline</p>
+                        </div>
+                        <div id='center'>
+                            {main_html}
+                        </div>
+                        <div id='right'>
+                            <p>Comments</p>
+                            <div>
+                                {comments_str}
+                            </div>
+                        </div>
                     </div>
                 "#
                     )
                 }
             }
-            // main_html,
             _ => main_html,
         }
     }
